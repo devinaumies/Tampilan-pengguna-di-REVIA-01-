@@ -1,0 +1,1229 @@
+
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>REVIA — UI v2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f6f2;
+    --surface: #ffffff;
+    --surface2: #eef1eb;
+    --border: #dde2d8;
+    --text: #1a1f17;
+    --muted: #5c6757;
+    --accent: #2e7d4f;
+    --accent2: #5db87a;
+    --accent3: #a8d5b5;
+    --accent-light: #e4f2ea;
+    --amber: #d48b2f;
+    --amber-light: #f5e8cc;
+    --red: #c04a3a;
+    --blue: #3a6b8a;
+    --blue-light: #dceaf2;
+    --earth: #8b6f47;
+    --earth-light: #f0e8dc;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+
+  body {
+    background: #b8c8b0;
+    font-family: var(--font);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 28px;
+    padding: 44px 28px 72px;
+    flex-wrap: wrap;
+    min-height: 100vh;
+  }
+
+  /* ── Phone Shell ── */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; }
+  .phone-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: rgba(20,40,15,0.5);
+    text-align: center; margin-bottom: 8px;
+  }
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: var(--bg);
+    border-radius: 44px;
+    box-shadow: 0 28px 72px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.55);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Notch */
+  .notch {
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 28px;
+    background: #111;
+    border-radius: 0 0 18px 18px;
+    z-index: 10;
+  }
+
+  /* Status bar */
+  .statusbar {
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text);
+    position: relative;
+    z-index: 5;
+    flex-shrink: 0;
+  }
+  .statusbar.light { color: #fff; }
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; font-size: 10px; }
+
+  /* Screen scroll area */
+  .screen { flex: 1; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* Nav bar */
+  .navbar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 10px 0 20px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; cursor: pointer; padding: 4px 0;
+  }
+  .nav-icon { font-size: 19px; line-height: 1; }
+  .nav-label { font-size: 9.5px; font-weight: 600; color: var(--muted); letter-spacing: 0.03em; text-transform: uppercase; }
+  .nav-item.active .nav-label { color: var(--accent); }
+  .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); margin-top: -2px; }
+
+  /* ── Shared ── */
+  .topbar {
+    background: var(--surface);
+    padding: 14px 20px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .topbar-title { font-size: 17px; font-weight: 800; color: var(--text); }
+  .topbar-sub { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px 8px;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .section-link { font-size: 12px; font-weight: 600; color: var(--accent); }
+
+  .gap { height: 12px; flex-shrink: 0; }
+  .gap-lg { height: 20px; flex-shrink: 0; }
+
+  /* ════════════════════════════════
+     SCREEN 06 — SPLASH
+  ════════════════════════════════ */
+  .splash {
+    flex: 1;
+    background: linear-gradient(160deg, #1a4d2e 0%, #2e7d4f 55%, #4aaa6e 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .splash-rings {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .splash-tagline { font-size: 13px; color: rgba(255,255,255,0.7); font-style: italic; margin-top: 6px; text-align: center; }
+  .splash-version { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 40px; }
+  .splash-bottom {
+    position: absolute; bottom: 40px; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .splash-btn {
+    width: 260px;
+    padding: 15px;
+    border-radius: 14px;
+    font-size: 15px; font-weight: 700;
+    text-align: center;
+  }
+  .splash-btn.primary { background: #fff; color: var(--accent); }
+  .splash-btn.secondary { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .splash-footer { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 8px; }
+
+  /* ════════════════════════════════
+     ONBOARDING
+  ════════════════════════════════ */
+  .onboard {
+    flex: 1; display: flex; flex-direction: column;
+    background: var(--surface);
+  }
+  .onboard-illu {
+    height: 300px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .onboard-illu.bg1 { background: #fdf4ec; }
+  .onboard-illu.bg2 { background: var(--accent-light); }
+  .onboard-illu.bg3 { background: #eaf0f8; }
+
+  .onboard-body { flex: 1; padding: 28px 28px 20px; display: flex; flex-direction: column; }
+  .onboard-step { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .onboard-title { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.25; }
+  .onboard-desc { font-size: 14px; color: var(--muted); margin-top: 10px; line-height: 1.6; flex: 1; }
+  .onboard-dots { display: flex; gap: 6px; justify-content: center; margin: 16px 0; }
+  .odot { width: 8px; height: 8px; border-radius: 4px; background: var(--border); transition: width 0.2s; }
+  .odot.active { width: 20px; background: var(--accent); }
+  .onboard-actions { display: flex; justify-content: space-between; align-items: center; }
+  .ob-skip { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .ob-next {
+    background: var(--accent); color: #fff;
+    padding: 13px 28px; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+  }
+
+  /* ════════════════════════════════
+     REGISTER / LOGIN
+  ════════════════════════════════ */
+  .regscreen { flex: 1; overflow-y: auto; }
+  .reg-hero {
+    background: linear-gradient(135deg, var(--accent), #4aaa6e);
+    padding: 28px 24px 22px;
+  }
+  .reg-hero-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .reg-hero-sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+
+  /* Tab toggle */
+  .reg-tabs {
+    display: flex; margin: 16px 20px 0;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+  }
+  .reg-tab {
+    flex: 1; text-align: center;
+    padding: 9px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 700; color: var(--muted);
+  }
+  .reg-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+
+  /* Account type grid */
+  .acct-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; padding: 0 20px;
+  }
+  .acct-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 6px 8px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .acct-card.selected { border-color: var(--accent); background: var(--accent-light); }
+  .acct-icon { font-size: 22px; margin-bottom: 4px; }
+  .acct-name { font-size: 10px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .acct-card.selected .acct-name { color: var(--accent); }
+
+  /* Form fields */
+  .form-group { padding: 0 20px; margin-bottom: 12px; }
+  .form-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .form-input {
+    width: 100%; padding: 11px 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px; color: var(--text);
+    font-family: var(--font);
+  }
+  .form-input.filled { border-color: var(--accent2); }
+  .form-input-icon {
+    position: relative;
+  }
+  .form-input-icon .form-input { padding-right: 38px; }
+  .input-icon {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; color: var(--muted);
+  }
+  .gps-row {
+    display: flex; gap: 8px; padding: 0 20px; margin-bottom: 12px;
+  }
+  .gps-field { flex: 1; padding: 11px 14px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; color: var(--muted); }
+  .gps-btn {
+    padding: 0 14px; background: var(--accent); color: #fff;
+    border-radius: var(--radius-sm); font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .reg-submit {
+    margin: 4px 20px 20px;
+    display: block; width: calc(100% - 40px);
+    background: var(--accent); color: #fff;
+    text-align: center; padding: 15px;
+    border-radius: var(--radius-sm);
+    font-size: 15px; font-weight: 700;
+  }
+  .reg-terms { font-size: 11px; color: var(--muted); text-align: center; padding: 0 24px 16px; line-height: 1.5; }
+  .reg-terms a { color: var(--accent); font-weight: 600; }
+
+  /* ════════════════════════════════
+     DASHBOARD
+  ════════════════════════════════ */
+  .dash-header {
+    background: linear-gradient(140deg, #1a4d2e 0%, #2e7d4f 100%);
+    padding: 16px 20px 22px;
+    flex-shrink: 0;
+  }
+  .dash-greeting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .dash-greeting { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .dash-name { font-size: 19px; font-weight: 800; color: #fff; }
+  .dash-score-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 20px; padding: 6px 12px;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .score-ring-sm {
+    width: 28px; height: 28px;
+  }
+
+  .dash-stats {
+    display: flex; gap: 10px;
+  }
+  .dash-stat {
+    flex: 1;
+    background: rgba(255,255,255,0.14);
+    border-radius: var(--radius-sm);
+    padding: 10px 10px 8px;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .dash-stat-val { font-size: 17px; font-weight: 800; color: #fff; line-height: 1; }
+  .dash-stat-label { font-size: 9.5px; color: rgba(255,255,255,0.65); margin-top: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+  .dash-stat-delta { font-size: 10px; color: var(--accent3); font-weight: 700; margin-top: 3px; }
+
+  /* Quick action row */
+  .quick-actions {
+    display: flex; gap: 10px; padding: 14px 20px 0; flex-shrink: 0;
+  }
+  .qa-btn {
+    flex: 1; background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 8px;
+    text-align: center;
+  }
+  .qa-icon { font-size: 20px; margin-bottom: 3px; }
+  .qa-label { font-size: 10px; font-weight: 700; color: var(--text); }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 84px; right: 20px;
+    width: 56px; height: 56px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #fff;
+    box-shadow: 0 4px 18px rgba(46,125,79,0.45);
+    z-index: 20;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  /* Feed items */
+  .feed-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .feed-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .fi-green { background: var(--accent-light); }
+  .fi-amber { background: var(--amber-light); }
+  .fi-blue { background: var(--blue-light); }
+  .fi-earth { background: var(--earth-light); }
+  .feed-body { flex: 1; }
+  .feed-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .feed-sub { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .feed-meta { font-size: 10.5px; color: var(--muted); white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+
+  /* Status badge inline */
+  .status-badge {
+    display: inline-block; padding: 2px 7px;
+    border-radius: 5px; font-size: 10px; font-weight: 700; margin-top: 4px;
+  }
+  .sb-green { background: var(--accent-light); color: var(--accent); }
+  .sb-amber { background: var(--amber-light); color: var(--amber); }
+  .sb-blue { background: var(--blue-light); color: var(--blue); }
+
+  /* ════════════════════════════════
+     UPLOAD RESOURCE
+  ════════════════════════════════ */
+  .upload-screen { flex: 1; overflow-y: auto; }
+
+  .resource-types {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; padding: 4px 20px;
+  }
+  .rt-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 4px 8px;
+    text-align: center; cursor: pointer;
+  }
+  .rt-card.sel { border-color: var(--accent); background: var(--accent-light); }
+  .rt-icon { font-size: 20px; margin-bottom: 3px; }
+  .rt-name { font-size: 9.5px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .rt-card.sel .rt-name { color: var(--accent); }
+  .rt-check {
+    width: 14px; height: 14px; border-radius: 4px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    margin: 4px auto 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: #fff;
+  }
+  .rt-card.sel .rt-check { background: var(--accent); border-color: var(--accent); }
+
+  /* Kondisi radio */
+  .radio-row { display: flex; gap: 8px; padding: 0 20px; }
+  .radio-opt {
+    flex: 1; padding: 9px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: 12px; font-weight: 700; color: var(--muted);
+  }
+  .radio-opt.sel { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+
+  /* Photo upload */
+  .photo-upload {
+    margin: 0 20px;
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    height: 120px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 6px;
+    position: relative; overflow: hidden;
+    cursor: pointer;
+  }
+  .photo-upload-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .photo-upload-sub { font-size: 11px; color: var(--border); }
+
+  /* Ketersediaan toggle */
+  .avail-row { display: flex; gap: 8px; padding: 0 20px; flex-wrap: wrap; }
+  .avail-chip {
+    padding: 7px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid var(--border); background: var(--surface); color: var(--muted);
+  }
+  .avail-chip.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .submit-btn {
+    display: block; margin: 16px 20px 24px;
+    width: calc(100% - 40px);
+    background: var(--accent); color: #fff;
+    text-align: center; padding: 15px;
+    border-radius: var(--radius-sm);
+    font-size: 15px; font-weight: 700;
+  }
+
+  /* Divider */
+  .divider { height: 8px; background: var(--bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+
+  /* pulse */
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+  .pulse { animation: pulse 2s infinite; }
+
+  /* footer */
+  footer {
+    width: 100%; text-align: center; padding: 28px 0 12px;
+    font-size: 11px; color: rgba(20,40,15,0.4);
+    font-family: var(--font);
+    border-top: 1px solid rgba(20,40,15,0.15);
+    margin-top: 24px;
+  }
+</style>
+</head>
+<body>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">06 — Splash / Logo</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar light" style="padding-top:18px">
+      <span>9:41</span>
+      <div class="icons"><span style="color:rgba(255,255,255,0.8)">▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="splash">
+      
+      <div class="splash-rings">
+        <svg width="420" height="420">
+          <circle cx="210" cy="210" r="195" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"></circle>
+          <circle cx="210" cy="210" r="155" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"></circle>
+          <circle cx="210" cy="210" r="115" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1"></circle>
+        </svg>
+      </div>
+
+      
+      <svg width="200" height="200" style="position:relative;z-index:2">
+        
+        <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"></circle>
+        
+        <path d="M100 28 C130 28 158 50 165 80" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3" stroke-linecap="round"></path>
+        <path d="M165 80 C172 110 158 142 135 158" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="3" stroke-linecap="round"></path>
+        <path d="M135 158 C110 174 78 170 58 150" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" stroke-linecap="round"></path>
+        <path d="M58 150 C36 128 38 95 55 75" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="3.5" stroke-linecap="round"></path>
+        
+        <polygon points="48,68 62,82 70,64" fill="white" opacity="0.9"></polygon>
+        
+        <ellipse cx="100" cy="88" rx="18" ry="28" fill="rgba(255,255,255,0.12)" transform="rotate(-20 100 88)"></ellipse>
+        <ellipse cx="100" cy="88" rx="18" ry="28" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" transform="rotate(-20 100 88)"></ellipse>
+        
+        <line x1="100" y1="72" x2="94" y2="104" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-linecap="round"></line>
+        
+        <circle cx="100" cy="120" r="5" fill="rgba(255,255,255,0.85)"></circle>
+        <circle cx="88" cy="120" r="3" fill="rgba(255,255,255,0.4)"></circle>
+        <circle cx="112" cy="120" r="3" fill="rgba(255,255,255,0.4)"></circle>
+      </svg>
+
+      
+      <div style="position:relative;z-index:2;text-align:center;margin-top:-8px">
+        <div style="font-size:46px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1">REVIA</div>
+        <div style="font-size:10.5px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:0.22em;text-transform:uppercase;margin-top:2px">Resource Value Intelligence &amp; Allocation</div>
+        <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.9);margin-top:12px;font-style:italic">"Ubah Limbah Jadi Nilai"</div>
+      </div>
+
+      
+      <div class="splash-bottom">
+        <div class="splash-btn primary">Mulai Sekarang</div>
+        <div class="splash-btn secondary">Masuk ke Akun</div>
+        <div class="splash-footer">v2.1.0 · Powered by Decision Engine</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">07 — Onboarding 1 / 3</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="padding-top:18px">
+      <span>9:41</span>
+      <div class="icons"><span>▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="onboard">
+      
+      <div class="onboard-illu bg1">
+        <svg width="320" height="280">
+          
+          <rect width="320" height="280" fill="#fdf4ec"></rect>
+          
+          <rect x="0" y="195" width="320" height="85" fill="#e8d5b8"></rect>
+          
+          <ellipse cx="160" cy="195" rx="110" ry="38" fill="#c8a876"></ellipse>
+          <ellipse cx="160" cy="178" rx="88" ry="30" fill="#d4b890"></ellipse>
+          <ellipse cx="160" cy="163" rx="65" ry="22" fill="#c8a876"></ellipse>
+          
+          <rect x="108" y="158" width="20" height="14" rx="3" fill="#e05c3a" opacity="0.8"></rect>
+          <rect x="135" y="162" width="16" height="10" rx="2" fill="#5a8fd4" opacity="0.7"></rect>
+          <rect x="158" y="155" width="22" height="16" rx="3" fill="#4aaa6e" opacity="0.6"></rect>
+          <rect x="185" y="160" width="14" height="12" rx="2" fill="#d4a830" opacity="0.8"></rect>
+          
+          <ellipse cx="90" cy="120" rx="20" ry="14" fill="#b8a090" opacity="0.35"></ellipse>
+          <ellipse cx="80" cy="100" rx="16" ry="12" fill="#b8a090" opacity="0.28"></ellipse>
+          <ellipse cx="96" cy="83" rx="14" ry="10" fill="#b8a090" opacity="0.2"></ellipse>
+          <ellipse cx="230" cy="110" rx="18" ry="13" fill="#b8a090" opacity="0.3"></ellipse>
+          <ellipse cx="242" cy="91" rx="14" ry="11" fill="#b8a090" opacity="0.22"></ellipse>
+          
+          <circle cx="160" cy="60" r="36" fill="#5a9fd4" opacity="0.85"></circle>
+          <circle cx="160" cy="60" r="36" fill="none" stroke="#3a7db8" stroke-width="2"></circle>
+          
+          <path d="M138 46 Q148 38 165 44 Q175 50 170 58 Q162 55 155 60 Q145 58 138 46Z" fill="#5db87a" opacity="0.8"></path>
+          <path d="M150 68 Q158 65 165 70 Q163 76 155 75Z" fill="#5db87a" opacity="0.7"></path>
+          
+          <line x1="150" y1="56" x2="150" y2="63" stroke="#1a4d2e" stroke-width="1.5" stroke-linecap="round"></line>
+          <line x1="170" y1="56" x2="170" y2="63" stroke="#1a4d2e" stroke-width="1.5" stroke-linecap="round"></line>
+          <path d="M150 74 Q160 69 170 74" fill="none" stroke="#1a4d2e" stroke-width="1.5" stroke-linecap="round"></path>
+          
+          <rect x="18" y="14" width="100" height="34" rx="8" fill="white" opacity="0.9"></rect>
+          <text x="28" y="30" font-size="11" font-weight="700" fill="#c04a3a" font-family="system-ui">69%</text>
+          <text x="28" y="43" font-size="9" fill="#5c6757" font-family="system-ui">limbah ke TPA</text>
+          <rect x="200" y="14" width="105" height="34" rx="8" fill="white" opacity="0.9"></rect>
+          <text x="210" y="30" font-size="11" font-weight="700" fill="#c04a3a" font-family="system-ui">7.2 juta ton</text>
+          <text x="210" y="43" font-size="9" fill="#5c6757" font-family="system-ui">/ tahun di Indonesia</text>
+        </svg>
+      </div>
+
+      <div class="onboard-body">
+        <div class="onboard-step">Masalah 01</div>
+        <div class="onboard-title">Limbah Menumpuk,<br />Nilai Terbuang</div>
+        <div class="onboard-desc">Setiap tahun jutaan ton limbah berakhir di TPA. Padahal di dalamnya tersimpan nilai ekonomi dan material yang bisa dimanfaatkan kembali — jika ada yang menghubungkan.</div>
+
+        <div class="onboard-dots">
+          <div class="odot active"></div>
+          <div class="odot"></div>
+          <div class="odot"></div>
+        </div>
+        <div class="onboard-actions">
+          <div class="ob-skip">Lewati</div>
+          <div class="ob-next">Selanjutnya →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">08 — Onboarding 2 / 3</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="padding-top:18px">
+      <span>9:41</span>
+      <div class="icons"><span>▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="onboard">
+      <div class="onboard-illu bg2">
+        <svg width="320" height="280">
+          <rect width="320" height="280" fill="#e8f5ee"></rect>
+
+          
+          <circle cx="160" cy="140" r="38" fill="#2e7d4f" opacity="0.9"></circle>
+          <circle cx="160" cy="140" r="28" fill="#4aaa6e"></circle>
+          <text x="160" y="145" text-anchor="middle" font-size="12" font-weight="900" fill="white" font-family="system-ui">REVIA</text>
+
+          
+          <line x1="160" y1="140" x2="60" y2="70" stroke="#5db87a" stroke-width="2" opacity="0.6"></line>
+          <line x1="160" y1="140" x2="260" y2="70" stroke="#5db87a" stroke-width="2" opacity="0.6"></line>
+          <line x1="160" y1="140" x2="52" y2="185" stroke="#5db87a" stroke-width="2" opacity="0.6"></line>
+          <line x1="160" y1="140" x2="268" y2="185" stroke="#5db87a" stroke-width="2" opacity="0.6"></line>
+          <line x1="160" y1="140" x2="160" y2="245" stroke="#5db87a" stroke-width="2" opacity="0.6"></line>
+
+          
+          <circle cx="60" cy="62" r="26" fill="white" stroke="#dde2d8" stroke-width="1.5"></circle>
+          <text x="60" y="57" text-anchor="middle" font-size="18" font-family="system-ui">🏠</text>
+          <text x="60" y="74" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Rumah</text>
+          <text x="60" y="84" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Tangga</text>
+
+          
+          <circle cx="260" cy="62" r="26" fill="white" stroke="#dde2d8" stroke-width="1.5"></circle>
+          <text x="260" y="57" text-anchor="middle" font-size="18" font-family="system-ui">🏭</text>
+          <text x="260" y="74" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Industri</text>
+          <text x="260" y="84" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">&amp; UMKM</text>
+
+          
+          <circle cx="50" cy="185" r="26" fill="white" stroke="#dde2d8" stroke-width="1.5"></circle>
+          <text x="50" y="180" text-anchor="middle" font-size="18" font-family="system-ui">🌾</text>
+          <text x="50" y="197" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Petani</text>
+
+          
+          <circle cx="270" cy="185" r="26" fill="white" stroke="#dde2d8" stroke-width="1.5"></circle>
+          <text x="270" y="180" text-anchor="middle" font-size="18" font-family="system-ui">♻️</text>
+          <text x="270" y="197" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Bank</text>
+          <text x="270" y="207" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Sampah</text>
+
+          
+          <circle cx="160" cy="248" r="26" fill="white" stroke="#dde2d8" stroke-width="1.5"></circle>
+          <text x="160" y="243" text-anchor="middle" font-size="18" font-family="system-ui">🏫</text>
+          <text x="160" y="263" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Sekolah &amp; Komunitas</text>
+
+          
+          <text x="108" y="105" text-anchor="middle" font-size="11" fill="#2e7d4f" font-weight="700" font-family="system-ui">→</text>
+          <text x="212" y="105" text-anchor="middle" font-size="11" fill="#2e7d4f" font-weight="700" font-family="system-ui">←</text>
+        </svg>
+      </div>
+
+      <div class="onboard-body">
+        <div class="onboard-step">Solusi 02</div>
+        <div class="onboard-title">Satu Platform,<br />Semua Terhubung</div>
+        <div class="onboard-desc">REVIA menghubungkan pemilik limbah dengan pihak yang membutuhkan resource tersebut — dari rumah tangga, petani, sekolah, hingga industri — dalam satu ekosistem sirkular.</div>
+
+        <div class="onboard-dots">
+          <div class="odot"></div>
+          <div class="odot active"></div>
+          <div class="odot"></div>
+        </div>
+        <div class="onboard-actions">
+          <div class="ob-skip">Lewati</div>
+          <div class="ob-next">Selanjutnya →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">09 — Onboarding 3 / 3</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="padding-top:18px">
+      <span>9:41</span>
+      <div class="icons"><span>▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="onboard">
+      <div class="onboard-illu bg3">
+        <svg width="320" height="280">
+          <rect width="320" height="280" fill="#eaf0f8"></rect>
+
+          
+          <rect x="105" y="95" width="110" height="90" rx="18" fill="#3a6b8a" opacity="0.9"></rect>
+          <rect x="115" y="105" width="90" height="70" rx="12" fill="#4a8baa"></rect>
+          
+          <line x1="130" y1="125" x2="190" y2="125" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"></line>
+          <line x1="130" y1="140" x2="190" y2="140" stroke="rgba(255,255,255,0.3)" stroke-width="1"></line>
+          <line x1="130" y1="155" x2="190" y2="155" stroke="rgba(255,255,255,0.3)" stroke-width="1"></line>
+          <circle cx="148" cy="125" r="4" fill="rgba(255,255,255,0.85)"></circle>
+          <circle cx="172" cy="140" r="4" fill="#a8d5b5"></circle>
+          <circle cx="160" cy="155" r="4" fill="rgba(255,255,255,0.6)"></circle>
+          <text x="160" y="174" text-anchor="middle" font-size="9" font-weight="700" fill="rgba(255,255,255,0.85)" font-family="system-ui">Decision Engine</text>
+
+          
+          <rect x="18" y="78" width="72" height="26" rx="8" fill="white" opacity="0.9"></rect>
+          <text x="54" y="89" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Jenis Material</text>
+          <text x="54" y="100" text-anchor="middle" font-size="8" fill="#5c6757" font-family="system-ui">Kualitas &amp; Berat</text>
+          <line x1="90" y1="91" x2="105" y2="120" stroke="#3a6b8a" stroke-width="2" opacity="0.5"></line>
+
+          <rect x="18" y="120" width="72" height="26" rx="8" fill="white" opacity="0.9"></rect>
+          <text x="54" y="131" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Lokasi GPS</text>
+          <text x="54" y="142" text-anchor="middle" font-size="8" fill="#5c6757" font-family="system-ui">Jarak &amp; Logistik</text>
+          <line x1="90" y1="133" x2="105" y2="140" stroke="#3a6b8a" stroke-width="2" opacity="0.5"></line>
+
+          <rect x="18" y="162" width="72" height="26" rx="8" fill="white" opacity="0.9"></rect>
+          <text x="54" y="173" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a1f17" font-family="system-ui">Permintaan</text>
+          <text x="54" y="184" text-anchor="middle" font-size="8" fill="#5c6757" font-family="system-ui">Pasar Lokal</text>
+          <line x1="90" y1="175" x2="105" y2="160" stroke="#3a6b8a" stroke-width="2" opacity="0.5"></line>
+
+          
+          <rect x="230" y="78" width="76" height="28" rx="8" fill="#2e7d4f" opacity="0.9"></rect>
+          <text x="268" y="90" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="system-ui">Recovery</text>
+          <text x="268" y="101" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="system-ui">Score</text>
+          <line x1="215" y1="118" x2="230" y2="92" stroke="#2e7d4f" stroke-width="2" opacity="0.6"></line>
+
+          <rect x="230" y="120" width="76" height="28" rx="8" fill="#d48b2f" opacity="0.9"></rect>
+          <text x="268" y="132" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="system-ui">Jalur</text>
+          <text x="268" y="143" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="system-ui">Recovery</text>
+          <line x1="215" y1="140" x2="230" y2="134" stroke="#d48b2f" stroke-width="2" opacity="0.6"></line>
+
+          <rect x="230" y="162" width="76" height="28" rx="8" fill="#5db87a" opacity="0.9"></rect>
+          <text x="268" y="174" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="system-ui">Match</text>
+          <text x="268" y="185" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="system-ui">Terbaik</text>
+          <line x1="215" y1="160" x2="230" y2="176" stroke="#5db87a" stroke-width="2" opacity="0.6"></line>
+
+          
+          <rect x="60" y="210" width="200" height="40" rx="10" fill="white" opacity="0.9"></rect>
+          <text x="160" y="227" text-anchor="middle" font-size="11" font-weight="800" fill="#1a1f17" font-family="system-ui">AI menentukan nilai terbaik</text>
+          <text x="160" y="243" text-anchor="middle" font-size="9.5" fill="#5c6757" font-family="system-ui">untuk setiap resource yang Anda miliki</text>
+        </svg>
+      </div>
+
+      <div class="onboard-body">
+        <div class="onboard-step">Fitur Utama 03</div>
+        <div class="onboard-title">Decision Engine<br />Cari Nilai Tertinggi</div>
+        <div class="onboard-desc">Mesin kecerdasan REVIA menganalisis jenis material, lokasi, dan permintaan pasar — lalu menghasilkan Recovery Score dan jalur pemulihan terbaik secara otomatis.</div>
+
+        <div class="onboard-dots">
+          <div class="odot"></div>
+          <div class="odot"></div>
+          <div class="odot active"></div>
+        </div>
+        <div class="onboard-actions">
+          <div class="ob-skip"></div>
+          <div class="ob-next" style="background:var(--accent);padding:13px 24px">Daftar Sekarang ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">10 — Daftar / Masuk</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="padding-top:18px">
+      <span>9:41</span>
+      <div class="icons"><span>▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="screen">
+      
+      <div class="reg-hero">
+        <div style="font-size:22px;margin-bottom:6px">🌿</div>
+        <div class="reg-hero-title">Bergabung dengan REVIA</div>
+        <div class="reg-hero-sub">Ubah limbahmu jadi sumber nilai nyata</div>
+      </div>
+
+      
+      <div class="reg-tabs">
+        <div class="reg-tab active">Daftar</div>
+        <div class="reg-tab">Masuk</div>
+      </div>
+
+      
+      <div class="section-header" style="padding-top:14px">
+        <div class="section-title">Pilih Tipe Akun</div>
+      </div>
+
+      <div class="acct-grid">
+        <div class="acct-card">
+          <div class="acct-icon">🏠</div>
+          <div class="acct-name">Rumah Tangga</div>
+        </div>
+        <div class="acct-card selected">
+          <div class="acct-icon">🏪</div>
+          <div class="acct-name">UMKM</div>
+        </div>
+        <div class="acct-card">
+          <div class="acct-icon">🏫</div>
+          <div class="acct-name">Sekolah</div>
+        </div>
+        <div class="acct-card">
+          <div class="acct-icon">👥</div>
+          <div class="acct-name">Komunitas</div>
+        </div>
+        <div class="acct-card">
+          <div class="acct-icon">🌾</div>
+          <div class="acct-name">Petani</div>
+        </div>
+        <div class="acct-card">
+          <div class="acct-icon">🏭</div>
+          <div class="acct-name">Industri</div>
+        </div>
+        <div class="acct-card" style="grid-column:span 3">
+          <div class="acct-icon">♻️</div>
+          <div class="acct-name">Bank Sampah / Pengepul</div>
+        </div>
+      </div>
+
+      <div class="divider" style="margin-top:14px"></div>
+
+      
+      <div style="height:12px"></div>
+
+      <div class="form-group">
+        <div class="form-label">Nama Lengkap / Nama Usaha</div>
+        <div class="form-input-icon">
+          <div class="form-input filled" style="color:var(--text)">Toko Maju Jaya</div>
+          <div class="input-icon">✓</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Alamat</div>
+        <div class="form-input" style="color:var(--muted)">Masukkan alamat lengkap…</div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">No. HP / WhatsApp</div>
+        <div class="form-input-icon">
+          <div class="form-input filled" style="color:var(--text)">+62 812 3456 7890</div>
+          <div class="input-icon">✓</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Lokasi GPS</div>
+      </div>
+      <div class="gps-row">
+        <div class="gps-field">-6.2088, 106.8456</div>
+        <div class="gps-btn">📍 Deteksi Lokasi</div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Kata Sandi</div>
+        <div class="form-input-icon">
+          <div class="form-input" style="color:var(--muted)">Minimal 8 karakter…</div>
+          <div class="input-icon">👁</div>
+        </div>
+      </div>
+
+      <div class="reg-terms">
+        Dengan mendaftar, Anda menyetujui <a href="#">Syarat &amp; Ketentuan</a> dan <a href="#">Kebijakan Privasi</a> REVIA.
+      </div>
+
+      <div class="reg-submit">Daftar &amp; Mulai</div>
+      <div style="height:8px"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">11 — Dashboard / Home</div>
+  <div class="phone" style="position:relative">
+    <div class="notch"></div>
+    <div class="statusbar light" style="padding-top:18px;background:transparent;position:absolute;top:0;left:0;right:0;z-index:6">
+      <span>9:41</span>
+      <div class="icons"><span style="color:rgba(255,255,255,0.85)">▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="screen">
+      
+      <div class="dash-header" style="padding-top:52px">
+        <div class="dash-greeting-row">
+          <div>
+            <div class="dash-greeting">Selamat pagi,</div>
+            <div class="dash-name">Toko Maju Jaya 👋</div>
+          </div>
+          <div class="dash-score-chip">
+            <svg class="score-ring-sm">
+              <circle cx="14" cy="14" r="11" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="3"></circle>
+              <circle cx="14" cy="14" r="11" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" stroke-linecap="round" transform="rotate(-90 14 14)"></circle>
+              <text x="14" y="18" text-anchor="middle" fill="white" font-size="7" font-weight="800" font-family="system-ui">78</text>
+            </svg>
+            Skor 78
+          </div>
+        </div>
+
+        
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <div class="dash-stat-val">2.4 t</div>
+            <div class="dash-stat-label">Tersalurkan</div>
+            <div class="dash-stat-delta">↑ +340 kg</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val">1.1 t</div>
+            <div class="dash-stat-label">CO₂ Dihindari</div>
+            <div class="dash-stat-delta">↑ +120 kg</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val">Rp 4.2 jt</div>
+            <div class="dash-stat-label">Pendapatan</div>
+            <div class="dash-stat-delta">↑ +18%</div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="quick-actions">
+        <div class="qa-btn">
+          <div class="qa-icon">🔍</div>
+          <div class="qa-label">Temukan Pembeli</div>
+        </div>
+        <div class="qa-btn">
+          <div class="qa-icon">📊</div>
+          <div class="qa-label">Lihat Jalur</div>
+        </div>
+        <div class="qa-btn">
+          <div class="qa-icon">🌱</div>
+          <div class="qa-label">Dampak Saya</div>
+        </div>
+        <div class="qa-btn">
+          <div class="qa-icon">🏆</div>
+          <div class="qa-label">Sertifikat</div>
+        </div>
+      </div>
+
+      
+      <div class="section-header">
+        <div class="section-title">Resource Aktif</div>
+        <div class="section-link">Lihat semua</div>
+      </div>
+
+      
+      <div style="padding:0 20px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;flex-shrink:0">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;min-width:130px;flex-shrink:0">
+          <div style="font-size:22px;margin-bottom:4px">📦</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">Kardus Bekas</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">45 kg · 3 tawaran</div>
+          <div class="status-badge sb-green" style="margin-top:6px">Aktif</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;min-width:130px;flex-shrink:0">
+          <div style="font-size:22px;margin-bottom:4px">🥫</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">Kaleng Aluminium</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">12 kg · 1 tawaran</div>
+          <div class="status-badge sb-amber" style="margin-top:6px">Menunggu</div>
+        </div>
+        <div style="background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius-sm);padding:12px;min-width:110px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+          <div style="font-size:24px;color:var(--accent)">+</div>
+          <div style="font-size:11px;font-weight:700;color:var(--accent)">Tambah Baru</div>
+        </div>
+      </div>
+
+      
+      <div class="section-header" style="padding-top:16px">
+        <div class="section-title">Aktivitas Terbaru</div>
+        <div class="section-link">Semua</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-icon fi-green">♻️</div>
+        <div class="feed-body">
+          <div class="feed-title">Match diterima — Kardus Bekas</div>
+          <div class="feed-sub">CV Daur Prima · 45 kg · Jalur: Daur Ulang</div>
+          <div class="status-badge sb-green">Selesai</div>
+        </div>
+        <div class="feed-meta">2j lalu</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-icon fi-amber">⚡</div>
+        <div class="feed-body">
+          <div class="feed-title">Decision Engine update</div>
+          <div class="feed-sub">Recovery Score naik +5 setelah verifikasi lokasi</div>
+        </div>
+        <div class="feed-meta">5j lalu</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-icon fi-blue">📦</div>
+        <div class="feed-body">
+          <div class="feed-title">Listing baru diposting</div>
+          <div class="feed-sub">Kaleng Aluminium Batch #3 · 12 kg · Menunggu match</div>
+          <div class="status-badge sb-amber">Menunggu</div>
+        </div>
+        <div class="feed-meta">1h lalu</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-icon fi-earth">🌱</div>
+        <div class="feed-body">
+          <div class="feed-title">Milestone dampak tercapai!</div>
+          <div class="feed-sub">1 ton CO₂ dihindari — sertifikat diterbitkan</div>
+        </div>
+        <div class="feed-meta">2h lalu</div>
+      </div>
+
+      <div class="gap-lg"></div>
+    </div>
+
+    
+    <div class="fab">+</div>
+
+    <div class="navbar">
+      <div class="nav-item active"><div class="nav-icon">🏠</div><div class="nav-label">Beranda</div><div class="nav-dot"></div></div>
+      <div class="nav-item"><div class="nav-icon">🔍</div><div class="nav-label">Temukan</div></div>
+      <div class="nav-item"><div class="nav-icon">⚡</div><div class="nav-label">Jalur</div></div>
+      <div class="nav-item"><div class="nav-icon">💬</div><div class="nav-label">Pesan</div></div>
+      <div class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profil</div></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="phone-wrap">
+  <div class="phone-label">12 — Upload Resource</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar" style="padding-top:18px">
+      <span>9:41</span>
+      <div class="icons"><span>▲▲▲ WiFi 100%</span></div>
+    </div>
+
+    <div class="screen">
+      <div class="topbar">
+        <div style="font-size:15px;color:var(--muted)">✕</div>
+        <div class="topbar-title">Tambah Resource</div>
+        <div style="font-size:12px;font-weight:600;color:var(--accent)">Simpan Draft</div>
+      </div>
+
+      
+      <div class="section-header">
+        <div class="section-title">Jenis Resource</div>
+        <div style="font-size:11px;color:var(--muted)">Bisa pilih lebih dari 1</div>
+      </div>
+
+      <div class="resource-types">
+        <div class="rt-card sel">
+          <div class="rt-icon">📦</div>
+          <div class="rt-name">Kertas &amp; Kardus</div>
+          <div class="rt-check">✓</div>
+        </div>
+        <div class="rt-card">
+          <div class="rt-icon">🥫</div>
+          <div class="rt-name">Logam &amp; Kaleng</div>
+          <div class="rt-check"></div>
+        </div>
+        <div class="rt-card">
+          <div class="rt-icon">🧴</div>
+          <div class="rt-name">Plastik</div>
+          <div class="rt-check"></div>
+        </div>
+        <div class="rt-card sel">
+          <div class="rt-icon">💻</div>
+          <div class="rt-name">E-Waste</div>
+          <div class="rt-check">✓</div>
+        </div>
+        <div class="rt-card">
+          <div class="rt-icon">🌿</div>
+          <div class="rt-name">Organik</div>
+          <div class="rt-check"></div>
+        </div>
+        <div class="rt-card">
+          <div class="rt-icon">👕</div>
+          <div class="rt-name">Tekstil</div>
+          <div class="rt-check"></div>
+        </div>
+        <div class="rt-card">
+          <div class="rt-icon">🪵</div>
+          <div class="rt-name">Kayu &amp; Bambu</div>
+          <div class="rt-check"></div>
+        </div>
+        <div class="rt-card">
+          <div class="rt-icon">🧪</div>
+          <div class="rt-name">Kimia / B3</div>
+          <div class="rt-check"></div>
+        </div>
+      </div>
+
+      <div class="divider" style="margin-top:12px"></div>
+
+      
+      <div class="form-group" style="padding-top:12px">
+        <div class="form-label">Estimasi Berat</div>
+        <div style="display:flex;gap:8px">
+          <div class="form-input filled" style="color:var(--text);flex:1">45</div>
+          <div style="display:flex;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
+            <div style="padding:10px 14px;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-light)">kg</div>
+            <div style="padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted)">ton</div>
+            <div style="padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted)">unit</div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="section-header" style="padding-top:4px">
+        <div class="section-title">Kondisi Material</div>
+      </div>
+      <div class="radio-row">
+        <div class="radio-opt sel">Bersih</div>
+        <div class="radio-opt">Campuran</div>
+        <div class="radio-opt">Kotor/B3</div>
+      </div>
+
+      
+      <div class="section-header" style="padding-top:12px">
+        <div class="section-title">Foto Material</div>
+        <div style="font-size:11px;color:var(--muted)">Maks. 4 foto</div>
+      </div>
+
+      <div class="photo-upload">
+        
+        <svg width="220" height="100">
+          <rect width="220" height="100" fill="#f7f8fa" rx="12"></rect>
+          
+          <rect x="60" y="50" width="42" height="34" rx="4" fill="#d4a830" opacity="0.7"></rect>
+          <rect x="64" y="46" width="34" height="6" rx="2" fill="#b88820" opacity="0.6"></rect>
+          <line x1="81" y1="50" x2="81" y2="84" stroke="#b88820" stroke-width="1.5" opacity="0.5"></line>
+          
+          <rect x="118" y="52" width="40" height="30" rx="4" fill="#3a6b8a" opacity="0.6"></rect>
+          <rect x="122" y="56" width="8" height="6" rx="1" fill="rgba(255,255,255,0.4)"></rect>
+          <rect x="134" y="56" width="6" height="6" rx="1" fill="rgba(255,255,255,0.35)"></rect>
+          <line x1="122" y1="67" x2="155" y2="67" stroke="rgba(255,255,255,0.3)" stroke-width="1"></line>
+          
+          <rect x="90" y="18" width="40" height="28" rx="6" fill="#e5e7eb"></rect>
+          <circle cx="110" cy="32" r="8" fill="white" opacity="0.8"></circle>
+          <circle cx="110" cy="32" r="5" fill="#9ca3af"></circle>
+          <rect x="95" y="20" width="8" height="4" rx="2" fill="#d1d5db"></rect>
+          
+          <text x="110" y="8" text-anchor="middle" font-size="8" fill="#9ca3af" font-family="system-ui">↑</text>
+        </svg>
+        <div class="photo-upload-label">Ketuk untuk unggah foto</div>
+        <div class="photo-upload-sub">JPG, PNG · Maks 10 MB per foto</div>
+      </div>
+
+      
+      <div class="section-header" style="padding-top:12px">
+        <div class="section-title">Lokasi Pengambilan</div>
+      </div>
+
+      
+      <div style="margin:0 20px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);height:80px;position:relative;overflow:hidden">
+        <svg width="100%" height="80">
+          
+          <line x1="0" y1="20" x2="335" y2="20" stroke="#dde2d8" stroke-width="0.5"></line>
+          <line x1="0" y1="40" x2="335" y2="40" stroke="#dde2d8" stroke-width="0.5"></line>
+          <line x1="0" y1="60" x2="335" y2="60" stroke="#dde2d8" stroke-width="0.5"></line>
+          <line x1="80" y1="0" x2="80" y2="80" stroke="#dde2d8" stroke-width="0.5"></line>
+          <line x1="160" y1="0" x2="160" y2="80" stroke="#dde2d8" stroke-width="0.5"></line>
+          <line x1="240" y1="0" x2="240" y2="80" stroke="#dde2d8" stroke-width="0.5"></line>
+          
+          <path d="M0 55 Q80 50 160 55 Q240 60 335 50" fill="none" stroke="#c8d4c0" stroke-width="6"></path>
+          <path d="M120 0 Q115 40 110 80" fill="none" stroke="#c8d4c0" stroke-width="5"></path>
+          
+          <circle cx="167" cy="40" r="12" fill="var(--accent)" opacity="0.9"></circle>
+          <circle cx="167" cy="40" r="5" fill="white"></circle>
+          <line x1="167" y1="52" x2="167" y2="58" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line>
+          
+          <circle cx="167" cy="40" r="22" fill="rgba(46,125,79,0.12)" stroke="rgba(46,125,79,0.3)" stroke-width="1"></circle>
+        </svg>
+        <div style="position:absolute;bottom:6px;right:8px;background:white;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--accent);border:1px solid var(--border)">📍 Gunakan lokasi saat ini</div>
+      </div>
+
+      
+      <div class="section-header" style="padding-top:12px">
+        <div class="section-title">Ketersediaan</div>
+      </div>
+      <div class="avail-row">
+        <div class="avail-chip sel">Segera (1-3 hari)</div>
+        <div class="avail-chip">Minggu ini</div>
+        <div class="avail-chip">Bulan ini</div>
+        <div class="avail-chip">Tentukan tanggal</div>
+      </div>
+
+      
+      <div class="form-group" style="padding-top:12px">
+        <div class="form-label">Catatan Tambahan (opsional)</div>
+        <div class="form-input" style="color:var(--muted);min-height:60px;display:flex;align-items:flex-start;padding-top:10px">Contoh: kardus dari toko retail, sudah dilipat rapi…</div>
+      </div>
+
+      
+      <div style="margin:4px 20px 0;background:var(--accent-light);border:1.5px solid var(--accent3);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:22px;flex-shrink:0">⚡</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent)">Decision Engine siap menganalisis</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Estimasi Recovery Score akan muncul setelah dikirim</div>
+        </div>
+        <div style="font-size:18px;font-weight:800;color:var(--accent);flex-shrink:0">~82</div>
+      </div>
+
+      <div class="submit-btn">Kirim Resource →</div>
+    </div>
+
+    <div class="navbar">
+      <div class="nav-item"><div class="nav-icon">🏠</div><div class="nav-label">Beranda</div></div>
+      <div class="nav-item"><div class="nav-icon">🔍</div><div class="nav-label">Temukan</div></div>
+      <div class="nav-item active"><div class="nav-icon">➕</div><div class="nav-label">Upload</div><div class="nav-dot"></div></div>
+      <div class="nav-item"><div class="nav-icon">💬</div><div class="nav-label">Pesan</div></div>
+      <div class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profil</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>Made with IBM Bob</footer>
+
+</body>
+</html>
